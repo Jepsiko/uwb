@@ -32,9 +32,13 @@
 /* Inter-ranging delay period, in milliseconds. */
 #define RNG_DELAY_MS 100
 
+/* IDs */
+#define INIT_ID 'A'
+#define RESP_ID 'B'
+
 /* Frames used in the ranging process. See NOTE 1,2 below. */
-static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0xE0, 0, 0};
-static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, RESP_ID, RESP_ID, INIT_ID, INIT_ID, 0xE0, 0, 0, 0, 0, 0};
+static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, INIT_ID, INIT_ID, RESP_ID, RESP_ID, 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 /* Length of the common part of the message (up to and including the function code, see NOTE 1 below). */
 #define ALL_MSG_COMMON_LEN 10
 /* Indexes to access some of the fields in the frames defined above. */
@@ -42,6 +46,9 @@ static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0xE
 #define RESP_MSG_POLL_RX_TS_IDX 10
 #define RESP_MSG_RESP_TX_TS_IDX 14
 #define RESP_MSG_TS_LEN 4
+#define POLL_MSG_RED_IDX 10
+#define POLL_MSG_GREEN_IDX 11
+#define POLL_MSG_BLUE_IDX 12
 /* Frame sequence number, incremented after each transmission. */
 static uint8 frame_seq_nb = 0;
 
@@ -82,7 +89,7 @@ static volatile int rx_count = 0 ; // Successful receive counter
 *
 * @return none
 */
-int ss_init_run(void)
+int ss_init_run(uint8 red, uint8 green, uint8 blue)
 {
 
 
@@ -91,6 +98,9 @@ int ss_init_run(void)
 
   /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
   tx_poll_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
+  tx_poll_msg[POLL_MSG_RED_IDX] = red;
+  tx_poll_msg[POLL_MSG_GREEN_IDX] = green;
+  tx_poll_msg[POLL_MSG_BLUE_IDX] = blue;
   dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
   dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
   dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
@@ -140,7 +150,7 @@ int ss_init_run(void)
     if (memcmp(rx_buffer, rx_resp_msg, ALL_MSG_COMMON_LEN) == 0)
     {	
       rx_count++;
-      printf("Reception # : %d\r\n",rx_count);
+      //printf("Reception # : %d\r\n",rx_count);
       uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
       int32 rtd_init, rtd_resp;
       float clockOffsetRatio ;
@@ -162,7 +172,7 @@ int ss_init_run(void)
 
       tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
       distance = tof * SPEED_OF_LIGHT;
-      printf("Distance : %f\r\n",distance);
+      //printf("Distance : %f\r\n",distance);
     }
   }
   else
@@ -216,7 +226,7 @@ void ss_initiator_task_function (void * pvParameter)
 
   while (true)
   {
-    ss_init_run();
+    ss_init_run(0, 0, 0);
     /* Delay a task for a given number of ticks */
     vTaskDelay(RNG_DELAY_MS);
     /* Tasks must be implemented to never return... */

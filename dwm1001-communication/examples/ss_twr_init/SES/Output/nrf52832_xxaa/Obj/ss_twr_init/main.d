@@ -1,10 +1,10 @@
 Output/nrf52832_xxaa/Obj/ss_twr_init/main.o: \
- C:\Users\arthu\Google\ Drive\Cours\MEMO-F524\ -\ Master\ thesis\Experiment\ RVR\Experiment\ Communication\dwm1001-examples\examples\ss_twr_init\main.c \
+ D:\Google\ Drive\Google\ Drive\ (jepsiko@gmail.com)\Cours\MEMO-F524\ -\ Master\ thesis\Experiment\ RVR\uwb\dwm1001-communication\examples\ss_twr_init\main.c \
  ../config/sdk_config.h \
  ../../../nRF5_SDK_14.2.0/external/freertos/source/include/FreeRTOS.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/stddef.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/__crossworks.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/stdint.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/stddef.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/__crossworks.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/stdint.h \
  ../../../nRF5_SDK_14.2.0/external/freertos/config/FreeRTOSConfig.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/app_util_platform.h \
  ../../../nRF5_SDK_14.2.0/components/device/compiler_abstraction.h \
@@ -22,8 +22,8 @@ Output/nrf52832_xxaa/Obj/ss_twr_init/main.o: \
  ../../../nRF5_SDK_14.2.0/components/device/compiler_abstraction.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/nrf_assert.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/app_error.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/stdio.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/stdbool.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/stdio.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/stdbool.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/sdk_errors.h \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/nordic_common.h \
@@ -45,7 +45,7 @@ Output/nrf52832_xxaa/Obj/ss_twr_init/main.o: \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/hal/nrf_gpio.h \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/hal/nrf_peripherals.h \
  ../../../nRF5_SDK_14.2.0/components/device/nrf52832_peripherals.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/stdlib.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/stdlib.h \
  ../../../boards/dw1001_dev.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/nordic_common.h \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/clock/nrf_drv_clock.h \
@@ -53,7 +53,7 @@ Output/nrf52832_xxaa/Obj/ss_twr_init/main.o: \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/hal/nrf_clock.h \
  ../../../nRF5_SDK_14.2.0/components/drivers_nrf/common/nrf_drv_common.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/sdk_common.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.66/include/string.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.64/include/string.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/sdk_os.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/app_util.h \
  ../../../nRF5_SDK_14.2.0/components/libraries/util/sdk_macros.h \
@@ -71,4 +71,4 @@ Output/nrf52832_xxaa/Obj/ss_twr_init/main.o: \
  ../../../deca_driver/deca_types.h ../../../deca_driver/deca_device_api.h \
  ../../../deca_driver/deca_param_types.h \
  ../../../deca_driver/deca_types.h ../../../deca_driver/deca_regs.h \
- ../../../deca_driver/deca_version.h ../UART/uart.h
+ ../../../deca_driver/deca_version.h ../UART/UART.h

@@ -34,7 +34,7 @@
 #include "deca_param_types.h"
 #include "deca_regs.h"
 #include "deca_device_api.h"
-#include "uart.h"
+#include "UART.h"
 	
 //-----------------dw1000----------------------------
 
@@ -104,9 +104,22 @@ static void led_toggle_timer_callback (void * pvParameter)
 }
 #else
 
-  extern int ss_init_run(void);
+  extern int ss_init_run(uint8, uint8, uint8);
 
 #endif   // #ifdef USE_FREERTOS
+
+
+int get_number() {
+  int number = 0;
+  char c[1];
+  while (c[0] != 'F') {
+    c[0] = '\0';
+    boUART_getc(c);
+    if (isdigit(c[0])) number = number * 10 + c[0] - '0';
+  }
+  return number;
+}
+
 
 int main(void)
 {
@@ -115,8 +128,8 @@ int main(void)
   // BSP_LED_1_MASK = BLUE
   // BSP_LED_2_MASK = RED1
   // BSP_LED_3_MASK = RED2
-  LEDS_CONFIGURE(BSP_LED_1_MASK);
-  LEDS_ON(BSP_LED_1_MASK);
+  LEDS_CONFIGURE(BSP_LED_0_MASK);
+  LEDS_ON(BSP_LED_0_MASK);
 
   #ifdef USE_FREERTOS
     /* Create task for LED0 blinking with priority set to 2 */
@@ -183,9 +196,23 @@ int main(void)
 
     // No RTOS task here so just call the main loop here.
     // Loop forever responding to ranging requests.
+
+    uint8 red = 13;
+    uint8 green = 15;
+    uint8 blue = 1;
+
+    char c[1];
+
     while (1)
     {
-      ss_init_run();
+      boUART_getc(c);
+
+      if (c[0] == 'T') ss_init_run(red, green, blue);
+      else if (c[0] == 'R') red = get_number();
+      else if (c[0] == 'G') green = get_number();
+      else if (c[0] == 'B') blue = get_number();
+
+      c[0] = '\0';
     }
 
   #endif

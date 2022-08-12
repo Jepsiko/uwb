@@ -56,8 +56,9 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="14" y="110" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../main.c" selected="1" top="88" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="14" y="110" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../main.c" selected="0" top="88" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="1" y="249" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../ss_init_resp.c" selected="0" top="228" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="98" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../ss_twr_init/ss_init_main.c" selected="1" top="56" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="ss_twr_resp" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/arthu/Google Drive/Cours/MEMO-F524 - Master thesis/Experiment RVR/Experiment Communication/dwm1001-examples/examples/ss_twr_resp_uart" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>
