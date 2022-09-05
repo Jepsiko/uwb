@@ -24,17 +24,6 @@
   <ProjectSessionItem path="ss_twr_init"/>
   <ProjectSessionItem path="ss_twr_init;ss_twr_init"/>
   <ProjectSessionItem path="ss_twr_init;ss_twr_init;Application"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Board Definition"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Board Support"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Config"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Decadriver"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Freertos"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Internal Files"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;nRF_Drivers"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;nRF_Libraries"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;nRF_Log"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;nRF_Segger_RTT"/>
-  <ProjectSessionItem path="ss_twr_init;ss_twr_init;Uart"/>
  </Project>
  <Register1>
   <RegisterWindow visibleNodes="CPU - Current Context/r0;CPU - Current Context/r1;CPU - Current Context/r2;CPU - Current Context/r3;CPU - Current Context/r4;CPU - Current Context/r5;CPU - Current Context/r6;CPU - Current Context/r7;CPU - Current Context/r8;CPU - Current Context/r9;CPU - Current Context/r10;CPU - Current Context/r11;CPU - Current Context/r12;CPU - Current Context/sp(r13);CPU - Current Context/lr(r14);CPU - Current Context/pc(r15);CPU - Current Context/apsr;CPU/r0;CPU/r1;CPU/r2;CPU/r3;CPU/r4;CPU/r5;CPU/r6;CPU/r7;CPU/r8;CPU/r9;CPU/r10;CPU/r11;CPU/r12;CPU/sp(r13);CPU/lr(r14);CPU/pc(r15);CPU/xpsr" binaryNodes="" asciiNodes="" openNodes="CPU - Current Context" name="ss_twr_init" decimalNodes="" octalNodes="" unsignedNodes=""/>
@@ -67,16 +56,8 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="116" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../main.c" selected="1" top="77" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="218" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../ss_init_main.c" selected="0" top="196" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="110" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../nRF5_SDK_14.2.0/components/libraries/uart/retarget.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../nRF5_SDK_14.2.0/external/freertos/source/tasks.c" selected="0" top="306" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="46" y="17" useTextEdit="1" openedFrom="C:/Users/arthu/Google Drive/Cours/MEMO-F524 - Master thesis/Experiment RVR/Experiment Communication/dwm1001-examples/examples/ss_twr_init/main.c" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="15" y="13" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../UART/UART.c" selected="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../UART/UART.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/Users/arthu/Google Drive/Cours/MEMO-F524 - Master thesis/Experiment RVR/Experiment Communication/dwm1001-examples/examples/ss_twr_init/UART/UART.c" useBinaryEdit="0" left="0" path="../../../nRF5_SDK_14.2.0/components/libraries/uart/app_uart.h" selected="0" top="9" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="16" y="42" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../nRF5_SDK_14.2.0/components/libraries/uart/app_uart_fifo.c" selected="0" top="18" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/Users/arthu/Google Drive/Cours/MEMO-F524 - Master thesis/Experiment RVR/Experiment Communication/dwm1001-examples/nRF5_SDK_14.2.0/components/libraries/uart/app_uart_fifo.c" useBinaryEdit="0" left="0" path="../../../nRF5_SDK_14.2.0/components/libraries/fifo/app_fifo.h" selected="0" top="18" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="124" useTextEdit="1" useBinaryEdit="0" left="0" path="../main.c" selected="1" top="185" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../ss_init_main.c" selected="0" top="0" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="ss_twr_init" fileDialogDefaultFilter="*.asm;*.s;*.inc" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" sessionSettings="" debugSearchFileMap="D:/Google Drive/Cours/MEMO-F524 - Master thesis/UWB/dwm1001-examples/examples/ss_twr_init/SES/RTE/thumb_crt0.s&#xa;" fileDialogInitialDirectory="C:/WorkArea/Repositories/dwm1001-keil-examples/nRF5_SDK_14.2.0/components/toolchain" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="ss_twr_init" fileDialogDefaultFilter="*.asm;*.s;*.inc" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" debugSearchFileMap="D:/Google Drive/Cours/MEMO-F524 - Master thesis/UWB/dwm1001-examples/examples/ss_twr_init/SES/RTE/thumb_crt0.s&#xa;" fileDialogInitialDirectory="C:/WorkArea/Repositories/dwm1001-keil-examples/nRF5_SDK_14.2.0/components/toolchain" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

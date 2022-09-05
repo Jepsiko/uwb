@@ -30,12 +30,12 @@
 #define RNG_DELAY_MS 80
 
 /* IDs */
-#define INIT_ID 'A'
-#define RESP_ID 'B'
+#define ID 1
 
 /* Frames used in the ranging process. See NOTE 2,3 below. */
-static uint8 rx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, RESP_ID, RESP_ID, INIT_ID, INIT_ID, 0xE0, 0, 0, 0, 0, 0};
-static uint8 tx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, INIT_ID, INIT_ID, RESP_ID, RESP_ID, 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8 rx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, ID, ID, 0, 0, 0xE0, 0, 0};
+static uint8 tx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, ID, ID, 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8 rx_dist_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, ID, ID, 0, 0, 0xE2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /* Length of the common part of the message (up to and including the function code, see NOTE 3 below). */
 #define ALL_MSG_COMMON_LEN 10
@@ -45,9 +45,6 @@ static uint8 tx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, INIT_ID, INIT_ID, RESP_
 #define RESP_MSG_POLL_RX_TS_IDX 10
 #define RESP_MSG_RESP_TX_TS_IDX 14
 #define RESP_MSG_TS_LEN 4	
-#define POLL_MSG_RED_IDX 10
-#define POLL_MSG_GREEN_IDX 11
-#define POLL_MSG_BLUE_IDX 12
 
 /* Frame sequence number, incremented after each transmission. */
 static uint8 frame_seq_nb = 0;
@@ -61,7 +58,7 @@ static uint8 rx_buffer[RX_BUF_LEN];
 static uint32 status_reg = 0;
 
 /* UWB microsecond (uus) to device time unit (dtu, around 15.65 ps) conversion factor.
-* 1 uus = 512 / 499.2 µs and 1 µs = 499.2 * 128 dtu. */
+* 1 uus = 512 / 499.2 s and 1 s = 499.2 * 128 dtu. */
 #define UUS_TO_DWT_TIME 65536
 
 // Not enough time to write the data so TX timeout extended for nRF operation.
@@ -89,6 +86,9 @@ static void resp_msg_set_ts(uint8 *ts_field, const uint64 ts);
 typedef unsigned long long uint64;
 static uint64 poll_rx_ts;
 static uint64 resp_tx_ts;
+
+void receive_distance(void);
+void set_init_id(int);
 
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn main()
@@ -136,13 +136,11 @@ int ss_resp_run(void)
     /* Check that the frame is a poll sent by "SS TWR initiator" example.
     * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
     rx_buffer[ALL_MSG_SN_IDX] = 0;
+    int init_id = rx_buffer[7];
+    set_init_id(init_id);
+
     if (memcmp(rx_buffer, rx_poll_msg, ALL_MSG_COMMON_LEN) == 0)
     {
-      uint8 red = rx_buffer[POLL_MSG_RED_IDX];
-      uint8 green = rx_buffer[POLL_MSG_GREEN_IDX];
-      uint8 blue = rx_buffer[POLL_MSG_BLUE_IDX];
-      printf("%d %d %d\r\n", red, green, blue);
-      //printf("Message received\r\n");
       uint32 resp_tx_time;
       int ret;
 
@@ -171,29 +169,30 @@ int ss_resp_run(void)
       /* If dwt_starttx() returns an error, abandon this ranging exchange and proceed to the next one. */
       if (ret == DWT_SUCCESS)
       {
-      /* Poll DW1000 until TX frame sent event set. See NOTE 5 below. */
-      while (!(dwt_read32bitreg(SYS_STATUS_ID) & SYS_STATUS_TXFRS))
-      {};
+        /* Poll DW1000 until TX frame sent event set. See NOTE 5 below. */
+        while (!(dwt_read32bitreg(SYS_STATUS_ID) & SYS_STATUS_TXFRS))
+        {};
 
-      /* Clear TXFRS event. */
-      dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
+        /* Clear TXFRS event. */
+        dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
 
-      /* Increment frame sequence number after transmission of the poll message (modulo 256). */
-      frame_seq_nb++;
+        /* Increment frame sequence number after transmission of the poll message (modulo 256). */
+        frame_seq_nb++;
+        receive_distance();
       }
       else
       {
-      /* If we end up in here then we have not succeded in transmitting the packet we sent up.
-      POLL_RX_TO_RESP_TX_DLY_UUS is a critical value for porting to different processors. 
-      For slower platforms where the SPI is at a slower speed or the processor is operating at a lower 
-      frequency (Comparing to STM32F, SPI of 18MHz and Processor internal 72MHz)this value needs to be increased.
-      Knowing the exact time when the responder is going to send its response is vital for time of flight 
-      calculation. The specification of the time of respnse must allow the processor enough time to do its 
-      calculations and put the packet in the Tx buffer. So more time is required for a slower system(processor).
-      */
+        /* If we end up in here then we have not succeded in transmitting the packet we sent up.
+        POLL_RX_TO_RESP_TX_DLY_UUS is a critical value for porting to different processors. 
+        For slower platforms where the SPI is at a slower speed or the processor is operating at a lower 
+        frequency (Comparing to STM32F, SPI of 18MHz and Processor internal 72MHz)this value needs to be increased.
+        Knowing the exact time when the responder is going to send its response is vital for time of flight 
+        calculation. The specification of the time of respnse must allow the processor enough time to do its 
+        calculations and put the packet in the Tx buffer. So more time is required for a slower system(processor).
+        */
 
-      /* Reset RX to properly reinitialise LDE operation. */
-      dwt_rxreset();
+        /* Reset RX to properly reinitialise LDE operation. */
+        dwt_rxreset();
       }
     }
   }
@@ -205,9 +204,70 @@ int ss_resp_run(void)
     /* Reset RX to properly reinitialise LDE operation. */
     dwt_rxreset();
   }
-
-  return(1);		
 }
+
+
+void receive_distance() {
+
+  /* Activate reception immediately. */
+  dwt_rxenable(DWT_START_RX_IMMEDIATE);
+
+  /* Poll for reception of a frame or error/timeout. See NOTE 5 below. */
+  while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
+  {};
+
+    #if 0	  // Include to determine the type of timeout if required.
+    int temp = 0;
+    // (frame wait timeout and preamble detect timeout)
+    if(status_reg & SYS_STATUS_RXRFTO )
+    temp =1;
+    else if(status_reg & SYS_STATUS_RXPTO )
+    temp =2;
+    #endif
+
+  if (status_reg & SYS_STATUS_RXFCG)
+  {
+    uint32 frame_len;
+
+    /* Clear good RX frame event in the DW1000 status register. */
+    dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG);
+
+    /* A frame has been received, read it into the local buffer. */
+    frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFL_MASK_1023;
+    if (frame_len <= RX_BUFFER_LEN)
+    {
+      dwt_readrxdata(rx_buffer, frame_len, 0);
+    }
+
+    /* Check that the frame is a poll sent by "SS TWR initiator" example.
+    * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
+    rx_buffer[ALL_MSG_SN_IDX] = 0;
+
+    if (memcmp(rx_buffer, rx_dist_msg, ALL_MSG_COMMON_LEN) == 0) {
+      double distance;
+      memcpy(&distance, rx_buffer + ALL_MSG_COMMON_LEN, sizeof(double));
+      printf("%f\r\n", distance);
+    }
+  }
+  else
+  {
+    /* Clear RX error events in the DW1000 status register. */
+    dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_ALL_RX_ERR);
+
+    /* Reset RX to properly reinitialise LDE operation. */
+    dwt_rxreset();
+  }
+}
+
+void set_init_id(int id) {
+  rx_poll_msg[7] = id;
+  rx_poll_msg[8] = id;
+  tx_resp_msg[5] = id;
+  tx_resp_msg[6] = id;
+  rx_dist_msg[7] = id;
+  rx_dist_msg[8] = id;
+}
+
 
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn get_rx_timestamp_u64()

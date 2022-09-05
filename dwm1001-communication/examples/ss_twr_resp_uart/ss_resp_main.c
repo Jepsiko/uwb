@@ -61,7 +61,7 @@ static uint8 rx_buffer[RX_BUF_LEN];
 static uint32 status_reg = 0;
 
 /* UWB microsecond (uus) to device time unit (dtu, around 15.65 ps) conversion factor.
-* 1 uus = 512 / 499.2 µs and 1 µs = 499.2 * 128 dtu. */
+* 1 uus = 512 / 499.2 s and 1 s = 499.2 * 128 dtu. */
 #define UUS_TO_DWT_TIME 65536
 
 // Not enough time to write the data so TX timeout extended for nRF operation.
@@ -143,6 +143,7 @@ int ss_resp_run(void)
       uint8 blue = rx_buffer[POLL_MSG_BLUE_IDX];
       printf("%d %d %d\r\n", red, green, blue);
       //printf("Message received\r\n");
+
       uint32 resp_tx_time;
       int ret;
 

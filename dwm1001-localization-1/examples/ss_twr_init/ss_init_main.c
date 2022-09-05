@@ -33,12 +33,13 @@
 #define RNG_DELAY_MS 100
 
 /* IDs */
-#define INIT_ID 'A'
-#define RESP_ID 'B'
+#define ID 0
 
 /* Frames used in the ranging process. See NOTE 1,2 below. */
-static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, RESP_ID, RESP_ID, INIT_ID, INIT_ID, 0xE0, 0, 0, 0, 0, 0};
-static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, INIT_ID, INIT_ID, RESP_ID, RESP_ID, 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, ID, ID, 0xE0, 0, 0};
+static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, ID, ID, 0, 0, 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8 tx_dist_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, ID, ID, 0xE2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 /* Length of the common part of the message (up to and including the function code, see NOTE 1 below). */
 #define ALL_MSG_COMMON_LEN 10
 /* Indexes to access some of the fields in the frames defined above. */
@@ -46,9 +47,6 @@ static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, INIT_ID, INIT_ID, RESP_
 #define RESP_MSG_POLL_RX_TS_IDX 10
 #define RESP_MSG_RESP_TX_TS_IDX 14
 #define RESP_MSG_TS_LEN 4
-#define POLL_MSG_RED_IDX 10
-#define POLL_MSG_GREEN_IDX 11
-#define POLL_MSG_BLUE_IDX 12
 /* Frame sequence number, incremented after each transmission. */
 static uint8 frame_seq_nb = 0;
 
@@ -61,7 +59,7 @@ static uint8 rx_buffer[RX_BUF_LEN];
 static uint32 status_reg = 0;
 
 /* UWB microsecond (uus) to device time unit (dtu, around 15.65 ps) conversion factor.
-* 1 uus = 512 / 499.2 µs and 1 µs = 499.2 * 128 dtu. */
+* 1 uus = 512 / 499.2 s and 1 s = 499.2 * 128 dtu. */
 #define UUS_TO_DWT_TIME 65536
 
 /* Speed of light in air, in metres per second. */
@@ -79,6 +77,11 @@ static void resp_msg_get_ts(uint8 *ts_field, uint32 *ts);
 static volatile int tx_count = 0 ; // Successful transmit counter
 static volatile int rx_count = 0 ; // Successful receive counter 
 
+void send_poll_msg(void);
+bool receive_resp_msg(void);
+void send_distance(void);
+void set_resp_id(int);
+
 
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn main()
@@ -89,18 +92,29 @@ static volatile int rx_count = 0 ; // Successful receive counter
 *
 * @return none
 */
-int ss_init_run(uint8 red, uint8 green, uint8 blue)
+int ss_init_run(void)
 {
+  for (int id = 0; id < 5; id++) {
+    if (id == ID) continue;
 
+    set_resp_id(id);
+    send_poll_msg();
+    if (receive_resp_msg()) {
+      printf("%f\r\n", distance);
+      send_distance();
+    }
 
-  /* Loop forever initiating ranging exchanges. */
+    deca_sleep(20);
+  }
 
+  /* Execute a delay between ranging exchanges. */
+  //deca_sleep(RNG_DELAY_MS);
+}
+
+void send_poll_msg(void) {
 
   /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
   tx_poll_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
-  tx_poll_msg[POLL_MSG_RED_IDX] = red;
-  tx_poll_msg[POLL_MSG_GREEN_IDX] = green;
-  tx_poll_msg[POLL_MSG_BLUE_IDX] = blue;
   dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
   dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
   dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
@@ -128,7 +142,9 @@ int ss_init_run(uint8 red, uint8 green, uint8 blue)
 
   /* Increment frame sequence number after transmission of the poll message (modulo 256). */
   frame_seq_nb++;
+}
 
+bool receive_resp_msg(void) {
   if (status_reg & SYS_STATUS_RXFCG)
   {		
     uint32 frame_len;
@@ -172,7 +188,7 @@ int ss_init_run(uint8 red, uint8 green, uint8 blue)
 
       tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
       distance = tof * SPEED_OF_LIGHT;
-      //printf("Distance : %f\r\n",distance);
+      return true;
     }
   }
   else
@@ -183,12 +199,38 @@ int ss_init_run(uint8 red, uint8 green, uint8 blue)
     /* Reset RX to properly reinitialise LDE operation. */
     dwt_rxreset();
   }
-
-  /* Execute a delay between ranging exchanges. */
-  //     deca_sleep(RNG_DELAY_MS);
-
-  //	return(1);
+  return false;
 }
+
+void send_distance() {
+  /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
+  tx_dist_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
+
+  memcpy(tx_dist_msg + ALL_MSG_COMMON_LEN, &distance, sizeof(double));
+
+  dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
+  dwt_writetxdata(sizeof(tx_dist_msg), tx_dist_msg, 0); /* Zero offset in TX buffer. */
+  dwt_writetxfctrl(sizeof(tx_dist_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
+
+  /* Start transmission, indicating that a response is expected so that reception is enabled automatically after the frame is sent and the delay
+  * set by dwt_setrxaftertxdelay() has elapsed. */
+  dwt_starttx(DWT_START_TX_IMMEDIATE);
+  tx_count++;
+  //printf("Transmission # : %d\r\n",tx_count);
+
+  /* Increment frame sequence number after transmission of the poll message (modulo 256). */
+  frame_seq_nb++;
+}
+
+void set_resp_id(int id) {
+  tx_poll_msg[5] = id;
+  tx_poll_msg[6] = id;
+  rx_resp_msg[7] = id;
+  rx_resp_msg[8] = id;
+  tx_dist_msg[5] = id;
+  tx_dist_msg[6] = id;
+}
+
 
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn resp_msg_get_ts()
@@ -226,7 +268,7 @@ void ss_initiator_task_function (void * pvParameter)
 
   while (true)
   {
-    ss_init_run(0, 0, 0);
+    ss_init_run();
     /* Delay a task for a given number of ticks */
     vTaskDelay(RNG_DELAY_MS);
     /* Tasks must be implemented to never return... */

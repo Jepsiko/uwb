@@ -104,7 +104,7 @@ static void led_toggle_timer_callback (void * pvParameter)
 }
 #else
 
-  extern int ss_init_run(uint8, uint8, uint8);
+  extern int ss_init_run();
 
 #endif   // #ifdef USE_FREERTOS
 
@@ -197,22 +197,9 @@ int main(void)
     // No RTOS task here so just call the main loop here.
     // Loop forever responding to ranging requests.
 
-    uint8 red = 13;
-    uint8 green = 15;
-    uint8 blue = 1;
-
-    char c[1];
-
     while (1)
     {
-      boUART_getc(c);
-
-      if (c[0] == 'T') ss_init_run(red, green, blue);
-      else if (c[0] == 'R') red = get_number();
-      else if (c[0] == 'G') green = get_number();
-      else if (c[0] == 'B') blue = get_number();
-
-      c[0] = '\0';
+      ss_init_run();
     }
 
   #endif
@@ -231,7 +218,7 @@ int main(void)
  *    device should have its own antenna delay properly calibrated to get good precision when performing range measurements.
  * 3. This timeout is for complete reception of a frame, i.e. timeout duration must take into account the length of the expected frame. Here the value
  *    is arbitrary but chosen large enough to make sure that there is enough time to receive the complete response frame sent by the responder at the
- *    6.8M data rate used (around 200 µs).
+ *    6.8M data rate used (around 200 s).
  * 4. In a real application, for optimum performance within regulatory limits, it may be necessary to set TX pulse bandwidth and TX power, (using
  *    the dwt_configuretxrf API call) to per device calibrated values saved in the target system or the DW1000 OTP memory.
  * 5. The user is referred to DecaRanging ARM application (distributed with EVK1000 product) for additional practical example of usage, and to the
